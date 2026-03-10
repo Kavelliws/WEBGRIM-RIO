@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fale com Hogwarts — Diretoria de Magia Epistolar</title>
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --parchment: #f2e8c9;
+      --parchment-dark: #e0cf9f;
+      --parchment-shadow: #c9a96e;
+      --ink: #2c1a0e;
+      --ink-light: #5c3d1e;
+      --gold: #c9a020;
+      --gold-dark: #7a5c00;
+      --red-hogwarts: #740001;
+    }
+    body {
+      min-height: 100vh;
+      background-color: #0d0d0d;
+      background-image:
+        radial-gradient(ellipse at 20% 20%, #1a0a00 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, #0a0a1a 0%, transparent 60%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.015'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      font-family: 'IM Fell English', Georgia, serif;
+    }
+    .particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .particle  { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: var(--gold); opacity: 0; animation: float-up linear infinite; }
+    @keyframes float-up {
+      0%   { transform: translateY(100vh) rotate(0deg);    opacity: 0; }
+      10%  { opacity: 0.7; }
+      90%  { opacity: 0.3; }
+      100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
+    }
+    .scene {
+      position: relative; z-index: 1; max-width: 820px; width: 100%;
+      animation: descend 1.2s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes descend {
+      from { opacity: 0; transform: translateY(-60px) rotate(-1deg); }
+      to   { opacity: 1; transform: translateY(0)    rotate(0deg);  }
+    }
+
+    /* Envelope flap */
+    .envelope-flap { position: relative; height: 60px; margin-bottom: -2px; overflow: hidden; }
+    .envelope-flap::before {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 0;
+      border-left: 410px solid transparent;
+      border-right: 410px solid transparent;
+      border-bottom: 60px solid var(--parchment-dark);
+      filter: drop-shadow(0 -2px 4px rgba(0,0,0,0.3));
+    }
+    .crest-top { position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); z-index: 2; }
+
+    /* Letter */
+    .letter {
+      background: var(--parchment);
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E"),
+        linear-gradient(160deg, #f5eccc 0%, #e8d5a3 40%, #f0e0b0 70%, #dfc990 100%);
+      border: 2px solid var(--parchment-shadow);
+      box-shadow: 0 0 0 6px rgba(0,0,0,0.4), 0 0 0 8px var(--gold-dark), 0 30px 80px rgba(0,0,0,0.8), inset 0 0 60px rgba(180,140,60,0.15);
+      padding: 56px 64px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .letter::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background-image: repeating-linear-gradient(transparent, transparent 31px, rgba(180,140,60,0.12) 31px, rgba(180,140,60,0.12) 32px);
+    }
+    .letter::after { content: ''; position: absolute; inset: 12px; border: 1px solid rgba(180,130,40,0.4); pointer-events: none; }
+
+    .corner { position: absolute; color: var(--gold-dark); opacity: 0.55; line-height: 1; }
+    .corner-tl { top: 16px; left: 16px; }
+    .corner-tr { top: 16px; right: 16px; }
+    .corner-bl { bottom: 16px; left: 16px; }
+    .corner-br { bottom: 16px; right: 16px; }
+
+    /* Header */
+    .letter-header { text-align: center; margin-bottom: 28px; }
+    .hogwarts-crest-svg { display: block; margin: 0 auto 10px; filter: drop-shadow(0 2px 8px rgba(180,120,0,0.35)); }
+    .school-name { font-family: 'Cinzel Decorative', serif; font-size: 27px; color: var(--red-hogwarts); letter-spacing: 0.07em; text-shadow: 1px 1px 0 rgba(200,160,30,0.4); margin-bottom: 4px; }
+    .school-subtitle { font-family: 'Cinzel', serif; font-size: 14px; color: var(--ink-light); letter-spacing: 0.25em; text-transform: uppercase; opacity: 0.7; }
+
+    .divider { display: flex; align-items: center; gap: 12px; margin: 18px 0; }
+    .divider-line { flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent); }
+    .divider-symbol { color: var(--gold-dark); font-size: 18px; }
+
+    .opening-text { font-family: 'IM Fell English', serif; font-style: italic; font-size: 19px; color: var(--ink); line-height: 1.9; margin-bottom: 28px; text-indent: 2em; }
+
+    /* Contact channels */
+    .channels-title {
+      font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 0.3em; color: var(--gold-dark);
+      text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+    }
+    .channels-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, var(--gold-dark), transparent); }
+
+    .channels-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 32px; }
+
+    .channel-card {
+      background: rgba(255,245,210,0.5);
+      border: 1px solid rgba(180,140,60,0.35);
+      padding: 16px 14px 14px;
+      text-align: center; text-decoration: none;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      transition: background 0.25s, box-shadow 0.25s, transform 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .channel-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(160deg, rgba(200,160,40,0.08) 0%, transparent 60%); }
+    .channel-card:hover { background: rgba(255,245,200,0.75); box-shadow: 0 4px 18px rgba(140,100,0,0.2); transform: translateY(-2px); }
+    .channel-icon { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background: rgba(180,140,60,0.12); border: 1px solid rgba(180,140,60,0.3); }
+    .channel-name  { font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 0.18em; color: var(--red-hogwarts); text-transform: uppercase; }
+    .channel-value { font-family: 'IM Fell English', serif; font-style: italic; font-size: 17px; color: var(--ink-light); line-height: 1.4; }
+    .channel-label { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.2em; color: var(--gold-dark); text-transform: uppercase; opacity: 0.7; }
+
+    /* Form */
+    .section-label {
+      font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 0.3em; color: var(--gold-dark);
+      text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, var(--gold-dark), transparent); }
+
+    .form-group { margin-bottom: 22px; position: relative; }
+    .form-label { font-family: 'Cinzel', serif; font-size: 14px; color: var(--ink-light); letter-spacing: 0.12em; display: block; margin-bottom: 7px; }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%; background: rgba(255,245,210,0.6); border: none;
+      border-bottom: 1.5px solid var(--parchment-shadow);
+      padding: 10px 4px; font-family: 'IM Fell English', serif; font-size: 18px; color: var(--ink);
+      outline: none; transition: border-color 0.3s, background 0.3s; appearance: none; -webkit-appearance: none;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-bottom-color: var(--gold); background: rgba(255,245,220,0.8); }
+    .form-input::placeholder, .form-textarea::placeholder { color: rgba(92,61,30,0.4); font-style: italic; font-size: 14px; }
+    .form-textarea { resize: vertical; min-height: 100px; line-height: 1.9; background-image: repeating-linear-gradient(transparent, transparent 27px, rgba(180,140,60,0.2) 27px, rgba(180,140,60,0.2) 28px); }
+    .form-select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M0 0l6 8 6-8z' fill='%237a5c00'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 6px center; padding-right: 28px; }
+    .form-select option { background: var(--parchment); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+    .input-wrapper { position: relative; }
+    .input-wrapper .quill-indicator { position: absolute; right: 2px; bottom: 10px; opacity: 0; transform: rotate(-30deg) translateY(4px); transition: opacity 0.3s, transform 0.3s; pointer-events: none; }
+    .form-input:focus ~ .quill-indicator, .form-textarea:focus ~ .quill-indicator { opacity: 1; transform: rotate(-30deg) translateY(0); }
+
+    /* Submit */
+    .submit-area { text-align: center; margin-top: 36px; }
+    .wax-seal { display: inline-flex; align-items: center; justify-content: center; width: 72px; height: 72px; background: radial-gradient(circle at 40% 35%, #cc0000, #7a0000 50%, #400000); border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.5), inset 0 -3px 6px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,100,100,0.2); margin: 0 auto 14px; }
+    .submit-btn {
+      font-family: 'Cinzel Decorative', serif; font-size: 17px; letter-spacing: 0.12em; color: var(--parchment);
+      background: linear-gradient(135deg, var(--red-hogwarts) 0%, #3d0001 60%, #7a0002 100%);
+      border: none; padding: 16px 48px; cursor: pointer; position: relative;
+      clip-path: polygon(12px 0%, calc(100% - 12px) 0%, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0% 50%);
+      transition: transform 0.2s, box-shadow 0.2s; text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(116,0,1,0.5), 0 0 30px rgba(200,150,0,0.2); }
+    .submit-btn:active { transform: translateY(0); }
+
+    /* Success */
+    .success-message { display: none; text-align: center; padding: 40px 20px; }
+    .success-message.visible { display: block; animation: appear 0.6s ease both; }
+    @keyframes appear { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }
+    @keyframes bob    { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+    .success-title { font-family: 'Cinzel Decorative', serif; font-size: 26px; color: var(--red-hogwarts); margin-bottom: 12px; }
+    .success-body  { font-family: 'IM Fell English', serif; font-style: italic; font-size: 19px; color: var(--ink); line-height: 1.9; }
+
+    /* Closing */
+    .closing-text { font-family: 'IM Fell English', serif; font-style: italic; font-size: 18px; color: var(--ink-light); line-height: 1.8; margin-top: 30px; text-align: right; }
+    .signature { font-family: 'Cinzel Decorative', serif; font-size: 17px; color: var(--red-hogwarts); margin-top: 6px; }
+    .post-scriptum { margin-top: 20px; font-family: 'IM Fell English', serif; font-style: italic; font-size: 16px; color: rgba(92,61,30,0.6); border-top: 1px dashed var(--parchment-shadow); padding-top: 14px; }
+
+    @media (max-width: 640px) {
+      .letter { padding: 40px 24px 48px; }
+      .form-row { grid-template-columns: 1fr; gap: 0; }
+      .channels-grid { grid-template-columns: 1fr; }
+      .school-name { font-size: 16px; }
+      .envelope-flap::before { border-left-width: 50vw; border-right-width: 50vw; }
+    }
+    @media (min-width: 641px) and (max-width: 820px) {
+      .channels-grid { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="particles" id="particles"></div>
+
+<div class="scene">
+
+  <!-- Envelope flap -->
+  <div class="envelope-flap">
+    <div class="crest-top">
+      <svg width="26" height="30" viewBox="0 0 26 30" fill="none">
+        <polygon points="15,1 4,17 13,17 11,29 22,13 13,13" fill="#7a5c00" stroke="#c9a020" stroke-width="1" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="letter">
+
+    <!-- Corner SVGs -->
+    <svg class="corner corner-tl" width="28" height="28" viewBox="0 0 28 28"><path d="M2 26 Q2 2 26 2" stroke="#7a5c00" stroke-width="1" fill="none" opacity="0.5"/><circle cx="4" cy="24" r="2" fill="#7a5c00" opacity="0.4"/><circle cx="24" cy="4" r="2" fill="#7a5c00" opacity="0.4"/><path d="M8 20 Q14 8 20 8" stroke="#c9a020" stroke-width="0.7" fill="none" opacity="0.5"/></svg>
+    <svg class="corner corner-tr" width="28" height="28" viewBox="0 0 28 28"><path d="M26 26 Q26 2 2 2" stroke="#7a5c00" stroke-width="1" fill="none" opacity="0.5"/><circle cx="24" cy="24" r="2" fill="#7a5c00" opacity="0.4"/><circle cx="4" cy="4" r="2" fill="#7a5c00" opacity="0.4"/><path d="M20 20 Q14 8 8 8" stroke="#c9a020" stroke-width="0.7" fill="none" opacity="0.5"/></svg>
+    <svg class="corner corner-bl" width="28" height="28" viewBox="0 0 28 28"><path d="M2 2 Q2 26 26 26" stroke="#7a5c00" stroke-width="1" fill="none" opacity="0.5"/><circle cx="4" cy="4" r="2" fill="#7a5c00" opacity="0.4"/><circle cx="24" cy="24" r="2" fill="#7a5c00" opacity="0.4"/><path d="M8 8 Q14 20 20 20" stroke="#c9a020" stroke-width="0.7" fill="none" opacity="0.5"/></svg>
+    <svg class="corner corner-br" width="28" height="28" viewBox="0 0 28 28"><path d="M26 2 Q26 26 2 26" stroke="#7a5c00" stroke-width="1" fill="none" opacity="0.5"/><circle cx="24" cy="4" r="2" fill="#7a5c00" opacity="0.4"/><circle cx="4" cy="24" r="2" fill="#7a5c00" opacity="0.4"/><path d="M20 8 Q14 20 8 20" stroke="#c9a020" stroke-width="0.7" fill="none" opacity="0.5"/></svg>
+
+    <!-- Header -->
+    <div class="letter-header">
+      <svg class="hogwarts-crest-svg" width="72" height="68" viewBox="0 0 72 68" fill="none">
+        <rect x="4"  y="22" width="14" height="38" fill="#740001" stroke="#c9a020" stroke-width="1"/>
+        <rect x="54" y="22" width="14" height="38" fill="#740001" stroke="#c9a020" stroke-width="1"/>
+        <rect x="4"  y="16" width="4" height="8"  fill="#740001" stroke="#c9a020" stroke-width="0.8"/>
+        <rect x="10" y="16" width="4" height="8"  fill="#740001" stroke="#c9a020" stroke-width="0.8"/>
+        <rect x="54" y="16" width="4" height="8"  fill="#740001" stroke="#c9a020" stroke-width="0.8"/>
+        <rect x="60" y="16" width="4" height="8"  fill="#740001" stroke="#c9a020" stroke-width="0.8"/>
+        <rect x="20" y="30" width="32" height="30" fill="#5c0001" stroke="#c9a020" stroke-width="1"/>
+        <rect x="20" y="24" width="5" height="8" fill="#5c0001" stroke="#c9a020" stroke-width="0.8"/>
+        <rect x="27" y="24" width="5" height="8" fill="#5c0001" stroke="#c9a020" stroke-width="0.8"/>
+        <rect x="34" y="24" width="5" height="8" fill="#5c0001" stroke="#c9a020" stroke-width="0.8"/>
+        <rect x="41" y="24" width="5" height="8" fill="#5c0001" stroke="#c9a020" stroke-width="0.8"/>
+        <path d="M29 60 L29 45 Q36 39 43 45 L43 60 Z" fill="#2c1a0e" stroke="#c9a020" stroke-width="0.8"/>
+        <rect x="9"  y="30" width="4" height="6" rx="2" fill="#c9a020" opacity="0.8"/>
+        <rect x="9"  y="42" width="4" height="6" rx="2" fill="#c9a020" opacity="0.6"/>
+        <rect x="59" y="30" width="4" height="6" rx="2" fill="#c9a020" opacity="0.8"/>
+        <rect x="59" y="42" width="4" height="6" rx="2" fill="#c9a020" opacity="0.6"/>
+        <rect x="25" y="34" width="4" height="6" rx="2" fill="#c9a020" opacity="0.7"/>
+        <rect x="43" y="34" width="4" height="6" rx="2" fill="#c9a020" opacity="0.7"/>
+        <polygon points="36,2 37.5,7 42,7 38.5,10 40,15 36,12 32,15 33.5,10 30,7 34.5,7" fill="#c9a020" stroke="#f0c040" stroke-width="0.4"/>
+      </svg>
+      <div class="school-name">Escola de Magia e Bruxaria de Hogwarts</div>
+      <div class="school-subtitle">Diretoria de Assuntos Epistolares &amp; Comunicações Mágicas</div>
+    </div>
+
+    <div class="divider"><div class="divider-line"></div><span class="divider-symbol">✦</span><div class="divider-line"></div></div>
+
+    <p class="opening-text">
+      Prezado(a) bruxo(a) ou ser-de-magia,<br><br>
+      É com grande honra que a Diretoria de Hogwarts abre os seus portões de pedra e os seus pergaminhos encantados a vós. Escolhei o canal mágico que melhor convém ao vosso propósito — seja pelo Fio Faladeiro, pela Coruja Veloz ou pela Missiva Escrita — e um de nossos magos correspondentes atenderá vossa solicitação com toda a dedicação que a arte da magia permite.
+    </p>
+
+    <!-- Channels -->
+    <div class="channels-title">Canais de Contacto da Diretoria</div>
+    <div class="channels-grid">
+
+      <!-- WhatsApp -->
+      <a class="channel-card" href="https://wa.me/5511999999999" target="_blank" rel="noopener">
+        <div class="channel-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <ellipse cx="11" cy="11" rx="9" ry="9" stroke="#7a5c00" stroke-width="1.3" fill="rgba(180,140,60,0.1)"/>
+            <!-- Speech bubble shape -->
+            <path d="M5 14 Q4 18 7 19 L6 15" fill="#7a5c00" opacity="0.6"/>
+            <path d="M6 7 Q6 4 11 4 Q16 4 16 8.5 Q16 13 11 13 Q9 13 7.5 12 L5 13 L6 10 Q5 9 5 8 Q5 7.5 6 7Z" stroke="#7a5c00" stroke-width="1.1" fill="rgba(180,140,60,0.08)"/>
+            <!-- dots inside bubble -->
+            <circle cx="9"  cy="8.5" r="1.1" fill="#7a5c00" opacity="0.7"/>
+            <circle cx="11" cy="8.5" r="1.1" fill="#7a5c00" opacity="0.7"/>
+            <circle cx="13" cy="8.5" r="1.1" fill="#7a5c00" opacity="0.7"/>
+          </svg>
+        </div>
+        <div class="channel-name">Coruja Veloz</div>
+        <div class="channel-value">(11) 99999-9999</div>
+        <div class="channel-label">WhatsApp da Diretoria</div>
+      </a>
+
+      <!-- Telefone -->
+      <a class="channel-card" href="tel:+551133334444">
+        <div class="channel-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <!-- handset -->
+            <path d="M5.5 3.5 C5.5 3.5 4 3 3 5 C2 7 3.5 10 6 12.5 C8.5 15 11.5 16.5 13.5 16 C15.5 15.5 16 14 16 14 L14 12 C14 12 13 12.5 12.5 12 C11 10.5 10.5 9.5 9.5 8.5 C9 8 9.5 7 9.5 7 Z" stroke="#7a5c00" stroke-width="1.3" fill="rgba(180,140,60,0.1)" stroke-linejoin="round"/>
+            <!-- stars indicating magic -->
+            <path d="M14 3 L14.5 5 L16.5 5 L15 6.5 L15.5 8.5 L14 7 L12.5 8.5 L13 6.5 L11.5 5 L13.5 5 Z" fill="#c9a020" opacity="0.7" stroke="#7a5c00" stroke-width="0.3"/>
+          </svg>
+        </div>
+        <div class="channel-name">Fio Faladeiro</div>
+        <div class="channel-value">(11) 3333-4444</div>
+        <div class="channel-label">Seg a Sex &mdash; 9h às 18h</div>
+      </a>
+
+      <!-- Email -->
+      <a class="channel-card" href="/cdn-cgi/l/email-protection#d0b4b9a2b5a4bfa2b9b190b8bfb7a7b1a2a4a3febdb7b3">
+        <div class="channel-icon">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="2" y="5" width="18" height="13" rx="1.5" stroke="#7a5c00" stroke-width="1.3" fill="rgba(180,140,60,0.1)"/>
+            <path d="M2 7 L11 13.5 L20 7" stroke="#7a5c00" stroke-width="1.2" stroke-linecap="round"/>
+            <!-- wax dot -->
+            <circle cx="11" cy="18" r="1.5" fill="#c9a020" opacity="0.6"/>
+          </svg>
+        </div>
+        <div class="channel-name">Missiva Eletrônica</div>
+        <div class="channel-value"><span class="__cf_email__" data-cfemail="82e6ebf0e7f6edf0ebe3c2eaede5f5e3f0f6f1acefe5e1">[email&#160;protected]</span></div>
+        <div class="channel-label">Resposta em até 3 luas</div>
+      </a>
+
+    </div>
+
+    <div class="divider"><div class="divider-line"></div><span class="divider-symbol">✦</span><div class="divider-line"></div></div>
+
+    <!-- Form -->
+    <div id="form-area">
+      <div class="section-label">Identificação do Remetente</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Vosso Nome Verdadeiro</label>
+          <div class="input-wrapper">
+            <input class="form-input" type="text" id="name" placeholder="Ex: Hermione J. Granger"/>
+            <span class="quill-indicator">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13 1 Q15 3 12 8 L7 15 L5 13 L12 8 Q6 5 13 1Z" fill="#7a5c00" opacity="0.7"/><path d="M7 15 L5 13 L4 15Z" fill="#7a5c00" opacity="0.5"/></svg>
+            </span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Coruja ou Endereço Postal</label>
+          <div class="input-wrapper">
+            <input class="form-input" type="email" id="email" placeholder="sua@coruja.owlpost.mgc"/>
+            <span class="quill-indicator">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13 1 Q15 3 12 8 L7 15 L5 13 L12 8 Q6 5 13 1Z" fill="#7a5c00" opacity="0.7"/><path d="M7 15 L5 13 L4 15Z" fill="#7a5c00" opacity="0.5"/></svg>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Vossa Casa de Hogwarts</label>
+          <select class="form-select" id="house">
+            <option value="" disabled selected>— Escolhei uma Casa —</option>
+            <option value="gryffindor">Grifinória — Bravura &amp; Coragem</option>
+            <option value="slytherin">Sonserina — Astúcia &amp; Ambição</option>
+            <option value="ravenclaw">Corvinal — Sabedoria &amp; Engenho</option>
+            <option value="hufflepuff">Lufa-Lufa — Lealdade &amp; Paciência</option>
+            <option value="muggle">Trouxa — Sem pertencimento a nenhuma Casa</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Natureza do Assunto</label>
+          <select class="form-select" id="subject">
+            <option value="" disabled selected>— Selecionai o Tema —</option>
+            <option value="enrollment">Matrícula &amp; Admissão</option>
+            <option value="dark">Magia das Trevas</option>
+            <option value="creatures">Criaturas Mágicas</option>
+            <option value="potions">Poções &amp; Elixires</option>
+            <option value="quidditch">Quadribol</option>
+            <option value="other">Outros Assuntos</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-label" style="margin-top:8px;">Conteúdo da Vossa Missiva</div>
+
+      <div class="form-group">
+        <label class="form-label">Corpo da Carta</label>
+        <div class="input-wrapper">
+          <textarea class="form-textarea" id="message" rows="5" placeholder="Escrevei aqui o vosso recado, dúvida ou encantamento verbal que desejais comunicar à Diretoria..."></textarea>
+          <span class="quill-indicator" style="bottom:14px;">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13 1 Q15 3 12 8 L7 15 L5 13 L12 8 Q6 5 13 1Z" fill="#7a5c00" opacity="0.7"/><path d="M7 15 L5 13 L4 15Z" fill="#7a5c00" opacity="0.5"/></svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Feitiço Preferencial de Resposta</label>
+        <div class="input-wrapper">
+          <input class="form-input" type="text" id="spell" placeholder="Ex: Alohomora, Expecto Patronum..."/>
+          <span class="quill-indicator">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13 1 Q15 3 12 8 L7 15 L5 13 L12 8 Q6 5 13 1Z" fill="#7a5c00" opacity="0.7"/><path d="M7 15 L5 13 L4 15Z" fill="#7a5c00" opacity="0.5"/></svg>
+          </span>
+        </div>
+      </div>
+
+      <div class="submit-area">
+        <div class="wax-seal" title="Selo Oficial de Hogwarts">
+          <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
+            <circle cx="19" cy="19" r="15" fill="none" stroke="rgba(255,180,100,0.25)" stroke-width="1"/>
+            <text x="19" y="24" text-anchor="middle" font-family="'Cinzel Decorative',serif" font-size="16" fill="#f2e8c9" opacity="0.9">H</text>
+          </svg>
+        </div><br>
+        <button class="submit-btn" onclick="sendLetter()">✦ Enviar Missiva ✦</button>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div class="success-message" id="success-area">
+      <svg width="80" height="76" viewBox="0 0 80 76" fill="none" style="display:block;margin:0 auto 16px;animation:bob 2s ease-in-out infinite">
+        <ellipse cx="40" cy="48" rx="20" ry="24" fill="#5c3d1e" stroke="#c9a020" stroke-width="1.2"/>
+        <path d="M20 48 Q8 34 13 21 Q22 38 20 48Z" fill="#3d2810" stroke="#c9a020" stroke-width="1"/>
+        <path d="M60 48 Q72 34 67 21 Q58 38 60 48Z" fill="#3d2810" stroke="#c9a020" stroke-width="1"/>
+        <circle cx="40" cy="27" r="15" fill="#5c3d1e" stroke="#c9a020" stroke-width="1.2"/>
+        <path d="M30 13 L27 4 L33 11Z" fill="#3d2810" stroke="#c9a020" stroke-width="0.8"/>
+        <path d="M50 13 L53 4 L47 11Z" fill="#3d2810" stroke="#c9a020" stroke-width="0.8"/>
+        <circle cx="33" cy="27" r="6" fill="#f0c040" stroke="#2c1a0e" stroke-width="0.8"/>
+        <circle cx="47" cy="27" r="6" fill="#f0c040" stroke="#2c1a0e" stroke-width="0.8"/>
+        <circle cx="33" cy="27" r="3" fill="#2c1a0e"/>
+        <circle cx="47" cy="27" r="3" fill="#2c1a0e"/>
+        <circle cx="34" cy="26" r="1" fill="white" opacity="0.8"/>
+        <circle cx="48" cy="26" r="1" fill="white" opacity="0.8"/>
+        <path d="M36 32 L40 36 L44 32 Q40 31 36 32Z" fill="#c9a020"/>
+        <rect x="28" y="62" width="24" height="14" rx="1" fill="#f2e8c9" stroke="#c9a020" stroke-width="1"/>
+        <path d="M28 64 L40 70 L52 64" stroke="#c9a020" stroke-width="0.8"/>
+      </svg>
+      <div class="success-title">Coruja Despachada!</div>
+      <p class="success-body">
+        Vossa missiva foi selada com lacre de fênix e entregue às mãos de nossa corujaria.<br><br>
+        Em breve, um de nossos magos correspondentes responderá ao vosso endereço com toda a urgência que a magia permite. Que o vosso patrono ilumine os dias de espera.
+      </p>
+    </div>
+
+    <!-- Closing -->
+    <div class="divider" style="margin-top:36px;"><div class="divider-line"></div><span class="divider-symbol">✦</span><div class="divider-line"></div></div>
+
+    <div class="closing-text">
+      Com os mais altos cumprimentos mágicos,<br>
+      <span class="signature">Albus Percival Wulfric Brian Dumbledore</span><br>
+      <em style="font-size:16px;">Diretor Supremo — Hogwarts, Escola de Magia e Bruxaria</em>
+    </div>
+
+    <p class="post-scriptum">
+      <strong>P.S.:</strong> Caso vossa coruja não retorne em três luas, certificai-vos de que ela não foi transformada em ornamento por nenhum estudante travesso de Sonserina. Nenhuma responsabilidade será atribuída à Diretoria por transfigurações não autorizadas de aves mensageiras.
+    </p>
+
+  </div><!-- .letter -->
+</div><!-- .scene -->
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // Particles
+  const container = document.getElementById('particles');
+  const syms = ['✦','★','·','∗','⁎','✧','⋆','✶'];
+  for (let i = 0; i < 38; i++) {
+    const p = document.createElement('div');
+    p.classList.add('particle');
+    if (Math.random() > 0.55) {
+      p.style.cssText = `width:auto;height:auto;background:none;border-radius:0;font-size:${Math.random()*10+7}px;color:hsl(${40+Math.random()*20},80%,${55+Math.random()*20}%)`;
+      p.textContent = syms[Math.floor(Math.random()*syms.length)];
+    } else {
+      const s = (Math.random()*3+1)+'px';
+      p.style.width = s; p.style.height = s;
+      p.style.background = `hsl(${40+Math.random()*15},70%,${60+Math.random()*20}%)`;
+    }
+    p.style.left = Math.random()*100+'vw';
+    p.style.animationDuration = (Math.random()*12+8)+'s';
+    p.style.animationDelay   = (Math.random()*14)+'s';
+    container.appendChild(p);
+  }
+
+  function sendLetter() {
+    const name    = document.getElementById('name').value.trim();
+    const email   = document.getElementById('email').value.trim();
+    const message = document.getElementById('message').value.trim();
+    if (!name)                         { shake('name');    return; }
+    if (!email || !email.includes('@')){ shake('email');   return; }
+    if (!message)                      { shake('message'); return; }
+    const fa = document.getElementById('form-area');
+    fa.style.transition = 'opacity 0.5s'; fa.style.opacity = '0';
+    setTimeout(() => { fa.style.display='none'; document.getElementById('success-area').classList.add('visible'); }, 500);
+  }
+
+  function shake(id) {
+    const el = document.getElementById(id);
+    el.style.animation = 'none'; el.offsetHeight;
+    el.style.animation = 'shake 0.4s ease';
+    el.addEventListener('animationend', () => el.style.animation='', {once:true});
+    el.focus();
+  }
+
+  const sty = document.createElement('style');
+  sty.textContent = `
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%
